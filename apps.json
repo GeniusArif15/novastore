@@ -1,0 +1,37 @@
+{
+  "apps": [
+    {
+      "id": "life-changer-heli-crash",
+      "createdAt": "2026-11-22T12:24:05.644Z",
+      "changelog": [
+        {
+          "version": "1.24",
+          "date": "2026-11-22T12:24:05.644Z",
+          "notes": "Version 1.24\n• New 3-dot menu with Night mode, themes and vibration\n• Smoother helicopter flight\n• Performance improvements and bug fixes"
+        }
+      ],
+      "screenshots": [
+        "apps/life-changer-heli-crash/shot-1795350245644-1.webp",
+        "apps/life-changer-heli-crash/shot-1795350245644-2.webp",
+        "apps/life-changer-heli-crash/shot-1795350245644-3.webp",
+        "apps/life-changer-heli-crash/shot-1795350245644-4.webp"
+      ],
+      "hidden": false,
+      "icon": "apps/life-changer-heli-crash/icon-1795350245644.webp",
+      "apkPath": "apks/life-changer-heli-crash-v1.24.apk",
+      "apkName": "life-changer-heli-crash-v1.24.apk",
+      "size": 7611561,
+      "name": "Life Changer: Heli Crash",
+      "version": "1.24",
+      "category": "Games",
+      "developer": "USA Developers",
+      "minAndroid": "7",
+      "packageName": "com.game.planecrash",
+      "shortDesc": "Follow the helicopter and tap UP or DOWN anytime!",
+      "description": "Life Changer is a fast helicopter game played with virtual coins.\n\nThe helicopter flies up and down on a live chart. Tap UP or DOWN anytime to trade, and close your trade at the right moment!\n\n• Green UP and red DOWN buttons – trade in one tap\n• Quick amounts: +10, +50, +100, +500 or MAX\n• Crash history and My trades at the top of the screen\n• DEMO mode with free practice coins to learn the game\n• Night mode, 7 color themes and a background slider\n• Vibration on/off and a built-in \"How to play\" guide\n\nLife Changer uses virtual coins only. Coins have no real-money value and cannot be bought, sold or exchanged for money.",
+      "whatsNew": "Version 1.24\n• New 3-dot menu with Night mode, themes and vibration\n• Smoother helicopter flight\n• Performance improvements and bug fixes",
+      "featured": true,
+      "updatedAt": "2026-11-22T12:24:05.644Z"
+    }
+  ]
+}

@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nova Store</title>
+<meta name="description" content="Nova Store – download apps and games by USA Developers">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='13' fill='%236d3df5'/%3E%3Cpath d='M24 9c1.2 7.6 7.4 13.8 15 15-7.6 1.2-13.8 7.4-15 15-1.2-7.6-7.4-13.8-15-15 7.6-1.2 13.8-7.4 15-15z' fill='white'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+<style>
+/* ===== Colors aur basic setup ===== */
+:root{--accent:#6d3df5;--accent2:#9b6bff;--accent-soft:#f1ecff;--text:#1d1b20;--muted:#5f6368;--line:#e6e4ec;--bg:#fff;--soft:#f6f5fa;--radius:16px}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:Roboto,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--text);background:var(--bg);line-height:1.5;min-height:100vh;display:flex;flex-direction:column}
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+.wrap{width:100%;max-width:1180px;margin:0 auto;padding:0 16px}
+.hidden{display:none!important}
+.muted{color:var(--muted);font-size:14px}
+
+/* ===== Top bar (logo + search) ===== */
+.topbar{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid transparent;transition:border-color .2s,box-shadow .2s}
+.topbar.scrolled{border-bottom-color:var(--line);box-shadow:0 2px 10px rgba(0,0,0,.04)}
+.topbar-in{display:flex;align-items:center;gap:16px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.logo{width:38px;height:38px}
+.brand-name{font-family:Poppins,sans-serif;font-size:21px;font-weight:600;letter-spacing:-.3px}
+.brand-name b{font-weight:700;color:var(--accent)}
+.search{flex:1;max-width:560px;margin-left:auto;display:flex;align-items:center;gap:10px;background:var(--soft);border-radius:999px;padding:0 16px;height:44px;border:1px solid transparent;transition:.2s}
+.search:focus-within{background:#fff;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.search svg{width:20px;height:20px;fill:var(--muted);flex-shrink:0}
+.search input{flex:1;border:0;background:none;outline:none;font:inherit;font-size:15px;min-width:0}
+@media(max-width:599px){.topbar-in{flex-wrap:wrap;height:auto;padding:10px 0;gap:10px}.search{order:3;flex-basis:100%;max-width:none;margin:0}}
+main{flex:1;padding-top:16px;padding-bottom:40px}
+
+/* ===== Featured banner ===== */
+.banner{position:relative;border-radius:24px;overflow:hidden;height:200px;margin-bottom:20px;background:linear-gradient(135deg,var(--accent),var(--accent2))}
+.slide{position:absolute;inset:0;opacity:0;transition:opacity .6s;display:flex;align-items:flex-end;padding:20px;background-size:cover;background-position:center}
+.slide.active{opacity:1;z-index:1}
+.slide::before{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(20,8,50,.88),rgba(20,8,50,.15) 75%)}
+.slide-in{position:relative;display:flex;align-items:center;gap:14px;color:#fff;width:100%}
+.slide-in img{width:56px;height:56px;border-radius:14px;background:#fff;object-fit:cover}
+.slide-txt{flex:1;min-width:0}
+.slide-tag{font-size:11px;text-transform:uppercase;letter-spacing:1px;opacity:.85}
+.slide-name{font-size:19px;font-weight:700}
+.slide-desc{font-size:13px;opacity:.9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.slide-btn{background:#fff;color:var(--accent);font-weight:700;padding:8px 18px;border-radius:999px;font-size:14px;flex-shrink:0}
+.dots{position:absolute;top:14px;right:16px;display:flex;gap:6px;z-index:2}
+.dots span{width:7px;height:7px;border-radius:4px;background:rgba(255,255,255,.5);transition:.3s}
+.dots span.on{background:#fff;width:18px}
+@media(min-width:768px){.banner{height:300px}.slide{padding:32px}.slide-in img{width:80px;height:80px;border-radius:20px}.slide-name{font-size:26px}.slide-desc{font-size:15px}}
+
+/* ===== Category chips ===== */
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:4px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex-shrink:0;padding:7px 16px;border:1px solid var(--line);border-radius:999px;font-size:14px;color:var(--muted);background:#fff;transition:.2s}
+.chip.on{background:var(--accent-soft);border-color:var(--accent-soft);color:var(--accent);font-weight:500}
+.sec-title{font-size:20px;font-weight:500;margin:18px 0 12px}
+
+/* ===== App cards (mobile = list, tablet/PC = grid) ===== */
+.app-grid{display:grid;grid-template-columns:1fr;gap:4px}
+.app-card{display:flex;align-items:center;gap:14px;padding:10px;border-radius:var(--radius);transition:background .2s}
+.app-card:hover{background:var(--soft)}
+.app-icon{width:64px;height:64px;border-radius:16px;object-fit:cover;background:var(--soft);box-shadow:0 1px 3px rgba(0,0,0,.12);flex-shrink:0}
+.app-meta{min-width:0}
+.app-name{font-weight:500;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.app-sub{font-size:13px;color:var(--muted)}
+@media(min-width:600px){.app-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}.app-card{flex-direction:column;align-items:flex-start;padding:12px}.app-icon{width:100%;height:auto;aspect-ratio:1;border-radius:22%}.app-meta{width:100%}}
+.empty{text-align:center;color:var(--muted);padding:60px 0}
+.loader{width:36px;height:36px;border:3px solid var(--accent-soft);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin:80px auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ===== App detail page ===== */
+.detail{display:grid;grid-template-columns:minmax(0,1fr);gap:24px}
+.back{display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:14px;margin-bottom:14px}
+.back svg{width:20px;height:20px;fill:currentColor}
+.d-head{display:flex;gap:18px;align-items:center}
+.d-icon{width:80px;height:80px;border-radius:20px;box-shadow:0 2px 8px rgba(0,0,0,.15);object-fit:cover;flex-shrink:0}
+.d-head h1{font-size:24px;font-weight:500;line-height:1.25}
+.d-dev{color:var(--accent);font-weight:500;font-size:14px;margin-top:2px}
+.d-tags{color:var(--muted);font-size:12px;margin-top:2px}
+.d-stats{display:flex;overflow-x:auto;margin:22px 0 18px;scrollbar-width:none}
+.d-stats::-webkit-scrollbar{display:none}
+.d-stats>div{flex:1 0 auto;text-align:center;padding:0 18px;border-left:1px solid var(--line);min-width:88px}
+.d-stats>div:first-child{border-left:0}
+.d-stats b{display:block;font-size:15px;font-weight:500}
+.d-stats span{font-size:12px;color:var(--muted)}
+.d-actions{display:flex;gap:10px;margin-bottom:24px}
+.btn-install{flex:1;background:var(--accent);color:#fff;font-weight:500;font-size:15px;height:44px;border-radius:12px;transition:.2s;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn-install:hover{background:#5a2be0;box-shadow:0 4px 14px rgba(109,61,245,.35)}
+.btn-ghost{height:44px;padding:0 16px;border-radius:12px;color:var(--accent);font-weight:500;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line)}
+.btn-ghost svg,.btn-install svg{width:20px;height:20px;fill:currentColor}
+@media(min-width:600px){.btn-install{flex:0 0 auto;min-width:220px;padding:0 28px}.d-icon{width:96px;height:96px;border-radius:22px}.d-head h1{font-size:30px}}
+.shots{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:8px;margin-bottom:24px;scrollbar-width:thin}
+.shots img{height:240px;width:auto;border-radius:12px;scroll-snap-align:start;cursor:zoom-in;border:1px solid var(--line);flex-shrink:0;background:var(--soft)}
+@media(min-width:768px){.shots img{height:320px}}
+.sec{margin-bottom:26px}
+.sec h2{font-size:18px;font-weight:500;margin-bottom:10px}
+.desc{color:#3c4043;font-size:14.5px;white-space:pre-line}
+.updated{margin-top:12px;font-size:13px;color:var(--muted)}
+details.log{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-top:12px}
+details.log summary{cursor:pointer;font-weight:500;font-size:14px}
+.log-item{padding:10px 0;border-top:1px solid var(--line);font-size:14px;margin-top:10px}
+.log-v{font-weight:500}
+.log-d{color:var(--muted);font-size:12px;font-weight:400}
+.side-card{border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-bottom:16px}
+.side-card h3{font-size:16px;font-weight:500;margin-bottom:6px}
+.qr-card{text-align:center;display:none}
+.qr-card #qrBox svg{width:180px;height:180px;margin:0 auto 10px;display:block}
+.qr-card p{font-size:13px;color:var(--muted)}
+.info-row{display:flex;justify-content:space-between;gap:10px;font-size:14px;padding:8px 0;border-top:1px solid var(--line)}
+.info-row:first-of-type{border-top:0}
+.info-row span:first-child{color:var(--muted)}
+.info-row span:last-child{text-align:right;word-break:break-word}
+@media(min-width:960px){.detail{grid-template-columns:minmax(0,1fr) 320px;gap:40px}.d-side{position:sticky;top:84px;align-self:start}.qr-card{display:block}}
+
+/* ===== Reviews ===== */
+.rv-sum{display:flex;gap:24px;align-items:center;margin-bottom:18px}
+.rv-big{text-align:center}
+.rv-big b{font-size:48px;font-weight:400;line-height:1;display:block}
+.stars{color:var(--accent);letter-spacing:1px}
+.rv-big span{font-size:12px;color:var(--muted)}
+.bars{flex:1;max-width:360px}
+.bar{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.bar i{flex:1;height:8px;background:var(--soft);border-radius:4px;overflow:hidden}
+.bar i em{display:block;height:100%;background:var(--accent);border-radius:4px}
+.rv{padding:14px 0;border-top:1px solid var(--line)}
+.rv-top{display:flex;align-items:center;gap:10px}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:500;font-size:14px}
+.rv-name{font-size:14px;font-weight:500}
+.rv-meta{font-size:12px;color:var(--muted);margin:6px 0 4px}
+.rv-text{font-size:14px;color:#3c4043;white-space:pre-line}
+.rv-form{background:var(--soft);border-radius:var(--radius);padding:16px;margin-bottom:16px}
+.rv-form h3{font-size:15px;font-weight:500;margin-bottom:6px}
+.star-pick{display:flex;gap:4px;margin-bottom:10px}
+.star-pick button{font-size:30px;line-height:1;color:#c9c5d6;transition:.15s}
+.star-pick button.on{color:var(--accent)}
+.rv-form input,.rv-form textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:inherit;font-size:14px;margin-bottom:10px;background:#fff;outline:none}
+.rv-form input:focus,.rv-form textarea:focus{border-color:var(--accent)}
+.rv-form textarea{resize:vertical;min-height:80px}
+.btn-sm{background:var(--accent);color:#fff;padding:9px 20px;border-radius:10px;font-weight:500;font-size:14px}
+.btn-sm:disabled{opacity:.6;cursor:default}
+
+/* ===== Install guide popup ===== */
+.modal{position:fixed;inset:0;z-index:100;background:rgba(15,10,30,.5);display:flex;align-items:flex-end;justify-content:center;animation:fade .2s}
+.modal-box{background:#fff;width:100%;max-width:440px;border-radius:24px 24px 0 0;padding:24px 22px calc(22px + env(safe-area-inset-bottom));animation:up .25s}
+@media(min-width:600px){.modal{align-items:center;padding:20px}.modal-box{border-radius:24px}}
+.modal-box h3{font-size:19px;font-weight:500;margin-bottom:4px}
+.steps{list-style:none;margin:14px 0}
+.steps li{display:flex;gap:12px;padding:8px 0;font-size:14px}
+.steps .n{width:28px;height:28px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;font-weight:700}
+.modal-actions{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.modal-actions label{font-size:13px;color:var(--muted);display:flex;gap:6px;align-items:center}
+@keyframes fade{from{opacity:0}}
+@keyframes up{from{transform:translateY(30px);opacity:0}}
+
+/* ===== Screenshot full view ===== */
+.lightbox{position:fixed;inset:0;z-index:110;background:rgba(0,0,0,.92);display:flex;align-items:center;justify-content:center}
+.lightbox img{max-width:92vw;max-height:88vh;border-radius:10px}
+.lb-btn{position:absolute;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.15);color:#fff;font-size:24px;display:flex;align-items:center;justify-content:center}
+.lb-close{top:16px;right:16px}.lb-prev{left:12px;top:50%;transform:translateY(-50%)}.lb-next{right:12px;top:50%;transform:translateY(-50%)}
+
+/* ===== Toast + footer ===== */
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);background:#2b2733;color:#fff;padding:10px 18px;border-radius:10px;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:120;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+footer{border-top:1px solid var(--line);padding:20px 0;font-size:13px;color:var(--muted);text-align:center}
+</style>
+</head>
+<body>
+
+<!-- Top bar: logo aur search -->
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a href="#/" class="brand">
+      <svg class="logo" viewBox="0 0 48 48"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9b6bff"/><stop offset="1" stop-color="#5a2be0"/></linearGradient></defs><rect width="48" height="48" rx="13" fill="url(#lg)"/><path d="M24 9c1.2 7.6 7.4 13.8 15 15-7.6 1.2-13.8 7.4-15 15-1.2-7.6-7.4-13.8-15-15 7.6-1.2 13.8-7.4 15-15z" fill="#fff"/></svg>
+      <span class="brand-name">Nova<b>Store</b></span>
+    </a>
+    <label class="search">
+      <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+      <input id="searchInput" type="search" placeholder="Search apps & games" autocomplete="off">
+    </label>
+  </div>
+</header>
+
+<!-- Yahan home ya app page aata hai -->
+<main id="view" class="wrap"></main>
+
+<footer><div class="wrap">© 2026 Nova Store · Apps by USA Developers</div></footer>
+
+<!-- Install guide popup -->
+<div id="guideModal" class="modal hidden">
+  <div class="modal-box">
+    <h3>Download started ✓</h3>
+    <p class="muted">To install the app on your Android phone:</p>
+    <ol class="steps">
+      <li><span class="n">1</span><span>Open the downloaded <b>.apk</b> file from notifications or the <b>Downloads</b> folder.</span></li>
+      <li><span class="n">2</span><span>If asked, tap <b>Settings</b> and turn on <b>Allow from this source</b>.</span></li>
+      <li><span class="n">3</span><span>If Play Protect shows a warning, tap <b>More details → Install anyway</b>.</span></li>
+      <li><span class="n">4</span><span>Tap <b>Install</b>, then open the app. Enjoy!</span></li>
+    </ol>
+    <div class="modal-actions">
+      <label><input type="checkbox" id="guideHide"> Don't show again</label>
+      <button class="btn-sm" id="guideOk">Got it</button>
+    </div>
+  </div>
+</div>
+
+<!-- Screenshot bari karke dikhane wala view -->
+<div id="lightbox" class="lightbox hidden">
+  <img id="lbImg" alt="">
+  <button class="lb-btn lb-close" id="lbClose" aria-label="Close">✕</button>
+  <button class="lb-btn lb-prev" id="lbPrev" aria-label="Previous">‹</button>
+  <button class="lb-btn lb-next" id="lbNext" aria-label="Next">›</button>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, getDocs, doc, setDoc, increment, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const TAG = "NovaStore";
+const STORE_URL = "https://geniusarif15.github.io/novastore/";
+const firebaseConfig = {
+  apiKey: "AIzaSyAxqEYyoepmVwfXy6lAQpvwODeEyg62BXU",
+  authDomain: "nova-store-27d05.firebaseapp.com",
+  projectId: "nova-store-27d05",
+  storageBucket: "nova-store-27d05.firebasestorage.app",
+  messagingSenderId: "54040497928",
+  appId: "1:54040497928:web:e8af1c3469c4a2dd90a6bd"
+};
+
+const ICON_BACK = '<svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>';
+const ICON_DL = '<svg viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/></svg>';
+const ICON_SHARE = '<svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11A2.99 2.99 0 0 0 21 5a3 3 0 1 0-5.91.7L8.04 9.81A3 3 0 1 0 6 15c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65a2.92 2.92 0 1 0 2.92-2.92z"/></svg>';
+
+// Firebase start karta hai (fail ho to store phir bhi chalega)
+let db = null;
+try {
+  db = getFirestore(initializeApp(firebaseConfig));
+  console.log(TAG, "Firebase ready");
+} catch (e) {
+  console.error(TAG, "Firebase init failed", e);
+}
+
+const state = { apps: [], stats: {}, category: "All", search: "" };
+const $ = (s) => document.querySelector(s);
+const view = $("#view");
+let bannerTimer = null;
+let lbList = [], lbIndex = 0;
+
+// Text ko HTML mein safe banata hai
+function esc(s) {
+  return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+// Bytes ko MB / KB mein badalta hai
+function fmtSize(b) {
+  if (!b) return "–";
+  if (b >= 1048576) return (b / 1048576).toFixed(1) + " MB";
+  return Math.max(1, Math.round(b / 1024)) + " KB";
+}
+
+// Downloads ko short form (1.2K) mein dikhata hai
+function fmtCount(n) {
+  n = n || 0;
+  if (n >= 1e6) return (n / 1e6).toFixed(1).replace(/\.0$/, "") + "M";
+  if (n >= 1e3) return (n / 1e3).toFixed(1).replace(/\.0$/, "") + "K";
+  return String(n);
+}
+
+// Date ko "Nov 22, 2026" jaisa banata hai
+function fmtDate(v) {
+  if (!v) return "–";
+  const d = typeof v === "object" && v.seconds ? new Date(v.seconds * 1000) : new Date(v);
+  return isNaN(d) ? "–" : d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+}
+
+// Rating ke stars ★★★☆☆ banata hai
+function starsTxt(r) {
+  const f = Math.max(0, Math.min(5, Math.round(r)));
+  return "★".repeat(f) + "☆".repeat(5 - f);
+}
+
+// localStorage se value parhta hai
+function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+
+// localStorage mein value save karta hai
+function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) { console.warn(TAG, "Storage blocked"); } }
+
+// Har device ki ek pakki ID banata hai (ek review per device ke liye)
+function getDeviceId() {
+  let id = lsGet("nova_device");
+  if (!id) {
+    id = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2);
+    lsSet("nova_device", id);
+    console.log(TAG, "New device id created");
+  }
+  return id;
+}
+
+// Neeche chhota message dikhata hai
+function toast(msg) {
+  const t = $("#toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => t.classList.remove("show"), 2600);
+}
+
+// apps.json se apps ki list laata hai
+async function loadApps() {
+  try {
+    const r = await fetch("apps.json?t=" + Date.now(), { cache: "no-store" });
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    const j = await r.json();
+    state.apps = (j.apps || []).filter((a) => !a.hidden);
+    console.log(TAG, "Apps loaded:", state.apps.length);
+  } catch (e) {
+    console.warn(TAG, "apps.json not available yet", e);
+    state.apps = [];
+  }
+}
+
+// Firestore se har app ke downloads laata hai
+async function loadStats() {
+  if (!db) return;
+  try {
+    const snap = await getDocs(collection(db, "stats"));
+    snap.forEach((d) => { state.stats[d.id] = d.data().downloads || 0; });
+    console.log(TAG, "Stats loaded");
+  } catch (e) {
+    console.error(TAG, "Stats load failed", e);
+  }
+}
+
+// URL dekh kar home ya app page dikhata hai
+function router() {
+  const m = (location.hash || "").match(/^#\/app\/([\w-]+)/);
+  console.log(TAG, "Route:", location.hash || "#/");
+  if (m) renderDetail(m[1]);
+  else { document.title = "Nova Store"; renderHome(); }
+  window.scrollTo(0, 0);
+}
+
+// Home page (banner, categories, apps) banata hai
+function renderHome() {
+  clearInterval(bannerTimer);
+  const q = state.search.trim().toLowerCase();
+  const cats = ["All", ...new Set(state.apps.map((a) => a.category).filter(Boolean))];
+  if (!cats.includes(state.category)) state.category = "All";
+  const list = state.apps.filter((a) =>
+    (state.category === "All" || a.category === state.category) &&
+    (!q || [a.name, a.shortDesc, a.category, a.developer].join(" ").toLowerCase().includes(q)));
+  const featured = state.apps.filter((a) => a.featured);
+
+  let html = "";
+  if (!q && featured.length) html += bannerHtml(featured);
+  if (cats.length > 2) html += `<div class="chips">${cats.map((c) => `<button class="chip${c === state.category ? " on" : ""}" data-cat="${esc(c)}">${esc(c)}</button>`).join("")}</div>`;
+  html += `<h2 class="sec-title">${q ? `Results for “${esc(state.search.trim())}”` : (state.category === "All" ? "All apps" : esc(state.category))}</h2>`;
+  html += list.length
+    ? `<div class="app-grid">${list.map(cardHtml).join("")}</div>`
+    : `<div class="empty">${state.apps.length ? "No apps found" : "No apps yet – check back soon!"}</div>`;
+  view.innerHTML = html;
+
+  view.querySelectorAll(".chip").forEach((c) => c.onclick = () => { state.category = c.dataset.cat; renderHome(); });
+  if (!q && featured.length > 1) startBanner();
+  console.log(TAG, "Home rendered:", list.length, "apps");
+}
+
+// Featured apps ka banner HTML banata hai
+function bannerHtml(items) {
+  const slides = items.map((a, i) => {
+    const bg = (a.screenshots && a.screenshots[0]) || a.icon;
+    return `<a href="#/app/${esc(a.id)}" class="slide${i === 0 ? " active" : ""}" style="background-image:url('${esc(bg)}')">
+      <div class="slide-in"><img src="${esc(a.icon)}" alt="">
+        <div class="slide-txt"><div class="slide-tag">Featured</div><div class="slide-name">${esc(a.name)}</div><div class="slide-desc">${esc(a.shortDesc || "")}</div></div>
+        <span class="slide-btn">View</span></div></a>`;
+  }).join("");
+  const dots = items.length > 1 ? `<div class="dots">${items.map((_, i) => `<span class="${i === 0 ? "on" : ""}"></span>`).join("")}</div>` : "";
+  return `<div class="banner" id="banner">${slides}${dots}</div>`;
+}
+
+// Banner ko har 5 second baad agli slide pe le jata hai
+function startBanner() {
+  const slides = [...document.querySelectorAll("#banner .slide")];
+  const dots = [...document.querySelectorAll("#banner .dots span")];
+  let i = 0;
+  bannerTimer = setInterval(() => {
+    slides[i].classList.remove("active"); dots[i]?.classList.remove("on");
+    i = (i + 1) % slides.length;
+    slides[i].classList.add("active"); dots[i]?.classList.add("on");
+  }, 5000);
+  console.log(TAG, "Banner started");
+}
+
+// Ek app card ka HTML banata hai
+function cardHtml(a) {
+  return `<a class="app-card" href="#/app/${esc(a.id)}">
+    <img class="app-icon" src="${esc(a.icon)}" alt="" loading="lazy">
+    <div class="app-meta"><div class="app-name">${esc(a.name)}</div>
+      <div class="app-sub">${esc(a.category || "App")}</div>
+      <div class="app-sub">${fmtSize(a.size)} · ${fmtCount(state.stats[a.id])} downloads</div></div></a>`;
+}
+
+// App info ki ek line banata hai
+function infoRow(k, v) {
+  return `<div class="info-row"><span>${esc(k)}</span><span>${esc(v || "–")}</span></div>`;
+}
+
+// App ka detail page banata hai
+function renderDetail(id) {
+  clearInterval(bannerTimer);
+  const a = state.apps.find((x) => x.id === id);
+  if (!a) {
+    view.innerHTML = `<div class="empty">App not found. <a href="#/" style="color:var(--accent)">Back to store</a></div>`;
+    console.warn(TAG, "App not found:", id);
+    return;
+  }
+  document.title = a.name + " – Nova Store";
+  const url = STORE_URL + "#/app/" + a.id;
+  const shots = a.screenshots || [];
+  const log = a.changelog || [];
+  const dev = a.developer || "USA Developers";
+
+  view.innerHTML = `<div class="detail">
+   <div class="d-main">
+    <a href="#/" class="back">${ICON_BACK} Back to store</a>
+    <div class="d-head"><img class="d-icon" src="${esc(a.icon)}" alt="">
+      <div><h1>${esc(a.name)}</h1><div class="d-dev">${esc(dev)}</div><div class="d-tags">${esc(a.category || "App")}</div></div></div>
+    <div class="d-stats">
+      <div><b id="stRating">–</b><span id="stReviews">No reviews</span></div>
+      <div><b id="stDl">${fmtCount(state.stats[a.id])}</b><span>Downloads</span></div>
+      <div><b>${fmtSize(a.size)}</b><span>Size</span></div>
+      <div><b>${esc(a.version || "–")}</b><span>Version</span></div>
+    </div>
+    <div class="d-actions">
+      <button class="btn-install" id="installBtn">${ICON_DL} Install</button>
+      <button class="btn-ghost" id="shareBtn">${ICON_SHARE} Share</button>
+    </div>
+    ${shots.length ? `<div class="shots">${shots.map((s, i) => `<img src="${esc(s)}" data-i="${i}" alt="Screenshot ${i + 1}" loading="lazy">`).join("")}</div>` : ""}
+    <section class="sec"><h2>About this app</h2><p class="desc">${esc(a.description || a.shortDesc || "")}</p>
+      <div class="updated">Updated on ${fmtDate(a.updatedAt)}</div></section>
+    ${(a.whatsNew || log.length > 1) ? `<section class="sec"><h2>What's new</h2>${a.whatsNew ? `<p class="desc">${esc(a.whatsNew)}</p>` : ""}
+      ${log.length > 1 ? `<details class="log"><summary>Version history (${log.length})</summary>${log.map((l) => `<div class="log-item"><div class="log-v">v${esc(l.version)} <span class="log-d">· ${fmtDate(l.date)}</span></div><div class="desc">${esc(l.notes || "")}</div></div>`).join("")}</details>` : ""}</section>` : ""}
+    <section class="sec"><h2>Ratings &amp; reviews</h2><div id="rvForm"></div><div id="rvBox"><p class="muted">Loading reviews…</p></div></section>
+   </div>
+   <aside class="d-side">
+    <div class="side-card qr-card"><div id="qrBox"></div><h3>Install on your phone</h3><p>Scan this QR code with your Android phone camera</p></div>
+    <div class="side-card"><h3>App info</h3>
+      ${infoRow("Version", a.version)}${infoRow("Updated", fmtDate(a.updatedAt))}${infoRow("Size", fmtSize(a.size))}
+      ${infoRow("Requires", a.minAndroid ? "Android " + a.minAndroid + " +" : "")}${infoRow("Developer", dev)}
+    </div>
+   </aside></div>`;
+
+  $("#installBtn").onclick = () => startDownload(a);
+  $("#shareBtn").onclick = () => shareApp(a, url);
+  view.querySelectorAll(".shots img").forEach((img) => img.onclick = () => openLightbox(shots, +img.dataset.i));
+  renderQR(url);
+  loadReviews(a.id);
+  console.log(TAG, "Detail rendered:", a.id);
+}
+
+// APK download shuru karta hai aur guide dikhata hai
+function startDownload(a) {
+  console.log(TAG, "Download:", a.apkPath);
+  if (!a.apkPath) { toast("APK not available"); return; }
+  const link = document.createElement("a");
+  link.href = a.apkPath;
+  link.download = a.apkName || a.id + ".apk";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  countDownload(a.id);
+  if (lsGet("nova_guide_hide") !== "1") $("#guideModal").classList.remove("hidden");
+  else toast("Download started");
+}
+
+// Firestore mein download count +1 karta hai (ek device se ek baar)
+async function countDownload(id) {
+  const key = "nova_dl_" + id;
+  if (!db || lsGet(key)) return;
+  try {
+    await setDoc(doc(db, "stats", id), { downloads: increment(1) }, { merge: true });
+    lsSet(key, "1");
+    state.stats[id] = (state.stats[id] || 0) + 1;
+    const el = $("#stDl");
+    if (el) el.textContent = fmtCount(state.stats[id]);
+    console.log(TAG, "Download counted:", id);
+  } catch (e) {
+    console.error(TAG, "Count failed", e);
+  }
+}
+
+// App ka link share ya copy karta hai
+async function shareApp(a, url) {
+  try {
+    if (navigator.share) {
+      await navigator.share({ title: a.name, text: a.shortDesc || "Download " + a.name, url });
+      console.log(TAG, "Shared");
+      return;
+    }
+    await navigator.clipboard.writeText(url);
+    toast("Link copied!");
+    console.log(TAG, "Link copied");
+  } catch (e) {
+    console.warn(TAG, "Share cancelled", e);
+  }
+}
+
+// PC pe QR code banata hai
+function renderQR(url) {
+  const box = $("#qrBox");
+  if (!box) return;
+  if (typeof qrcode !== "function") { box.innerHTML = '<p class="muted">QR unavailable</p>'; console.warn(TAG, "QR lib missing"); return; }
+  const qr = qrcode(0, "M");
+  qr.addData(url);
+  qr.make();
+  box.innerHTML = qr.createSvgTag(5, 2);
+  console.log(TAG, "QR ready");
+}
+
+// Screenshot bari karke kholta hai
+function openLightbox(list, i) {
+  lbList = list; lbIndex = i;
+  showLb();
+  $("#lightbox").classList.remove("hidden");
+  document.body.style.overflow = "hidden";
+  console.log(TAG, "Lightbox open:", i);
+}
+
+// Lightbox mein current screenshot dikhata hai
+function showLb() {
+  $("#lbImg").src = lbList[lbIndex];
+  const many = lbList.length > 1;
+  $("#lbPrev").style.display = many ? "" : "none";
+  $("#lbNext").style.display = many ? "" : "none";
+}
+
+// Lightbox band karta hai
+function closeLightbox() {
+  $("#lightbox").classList.add("hidden");
+  document.body.style.overflow = "";
+  console.log(TAG, "Lightbox closed");
+}
+
+// Agli / pichli screenshot pe jata hai
+function stepLb(d) {
+  lbIndex = (lbIndex + d + lbList.length) % lbList.length;
+  showLb();
+}
+
+// Firestore se is app ke reviews laata hai
+async function loadReviews(appId) {
+  const box = $("#rvBox");
+  if (!db) { box.innerHTML = '<p class="muted">Reviews unavailable.</p>'; return; }
+  try {
+    const snap = await getDocs(query(collection(db, "reviews"), where("appId", "==", appId)));
+    const list = [];
+    snap.forEach((d) => list.push(d.data()));
+    list.sort((x, y) => (y.createdAt?.seconds || 0) - (x.createdAt?.seconds || 0));
+    if (location.hash !== "#/app/" + appId) return;
+    renderReviews(list, appId);
+    console.log(TAG, "Reviews loaded:", list.length);
+  } catch (e) {
+    console.error(TAG, "Reviews failed", e);
+    box.innerHTML = '<p class="muted">Could not load reviews.</p>';
+  }
+}
+
+// Rating summary aur reviews ki list dikhata hai
+function renderReviews(list, appId) {
+  const box = $("#rvBox");
+  const n = list.length;
+  renderReviewForm(appId, list.some((r) => r.device === getDeviceId()));
+  if (!n) { box.innerHTML = '<p class="muted">No reviews yet. Be the first to review!</p>'; return; }
+  const avg = list.reduce((s, r) => s + (r.rating || 0), 0) / n;
+  const counts = [5, 4, 3, 2, 1].map((s) => list.filter((r) => r.rating === s).length);
+  $("#stRating").textContent = avg.toFixed(1) + " ★";
+  $("#stReviews").textContent = n + (n === 1 ? " review" : " reviews");
+  box.innerHTML = `<div class="rv-sum">
+      <div class="rv-big"><b>${avg.toFixed(1)}</b><div class="stars">${starsTxt(avg)}</div><span>${n} ${n === 1 ? "review" : "reviews"}</span></div>
+      <div class="bars">${counts.map((c, i) => `<div class="bar">${5 - i}<i><em style="width:${Math.round(c / n * 100)}%"></em></i></div>`).join("")}</div>
+    </div>
+    ${list.slice(0, 30).map((r) => `<div class="rv">
+      <div class="rv-top"><div class="avatar">${esc((r.name || "?").charAt(0).toUpperCase())}</div><div class="rv-name">${esc(r.name)}</div></div>
+      <div class="rv-meta"><span class="stars">${starsTxt(r.rating)}</span> · ${fmtDate(r.createdAt)}</div>
+      <div class="rv-text">${esc(r.text || "")}</div></div>`).join("")}`;
+}
+
+// Review likhne ka form banata hai
+function renderReviewForm(appId, done) {
+  const f = $("#rvForm");
+  if (!f) return;
+  if (done) { f.innerHTML = '<p class="muted" style="margin-bottom:14px">✓ Thanks! You have reviewed this app.</p>'; return; }
+  f.innerHTML = `<div class="rv-form"><h3>Rate this app</h3>
+    <div class="star-pick">${[1, 2, 3, 4, 5].map((s) => `<button type="button" data-s="${s}" aria-label="${s} stars">★</button>`).join("")}</div>
+    <input id="rvName" maxlength="40" placeholder="Your name">
+    <textarea id="rvText" maxlength="500" placeholder="Share your experience (optional)"></textarea>
+    <button class="btn-sm" id="rvSend">Post review</button></div>`;
+  let rating = 0;
+  const btns = f.querySelectorAll(".star-pick button");
+  btns.forEach((b) => b.onclick = () => {
+    rating = +b.dataset.s;
+    btns.forEach((x) => x.classList.toggle("on", +x.dataset.s <= rating));
+  });
+  $("#rvSend").onclick = () => submitReview(appId, rating);
+}
+
+// Review Firestore mein save karta hai
+async function submitReview(appId, rating) {
+  const name = $("#rvName").value.trim();
+  const text = $("#rvText").value.trim();
+  if (!rating) { toast("Please select stars"); return; }
+  if (!name) { toast("Please enter your name"); return; }
+  const btn = $("#rvSend");
+  btn.disabled = true; btn.textContent = "Posting…";
+  const device = getDeviceId();
+  try {
+    await setDoc(doc(db, "reviews", appId + "_" + device), { appId, name, rating, text, createdAt: serverTimestamp(), device });
+    toast("Review posted. Thank you!");
+    console.log(TAG, "Review posted");
+    loadReviews(appId);
+  } catch (e) {
+    console.error(TAG, "Review failed", e);
+    toast("Could not post review (maybe already reviewed)");
+    btn.disabled = false; btn.textContent = "Post review";
+  }
+}
+
+// Search, popup aur lightbox ke buttons jorta hai
+function bindGlobal() {
+  $("#searchInput").addEventListener("input", (e) => {
+    state.search = e.target.value;
+    if (/^#\/app\//.test(location.hash)) history.replaceState(null, "", "#/");
+    document.title = "Nova Store";
+    renderHome();
+  });
+  window.addEventListener("scroll", () => $(".topbar").classList.toggle("scrolled", scrollY > 4), { passive: true });
+  $("#guideOk").onclick = () => {
+    if ($("#guideHide").checked) lsSet("nova_guide_hide", "1");
+    $("#guideModal").classList.add("hidden");
+  };
+  $("#guideModal").onclick = (e) => { if (e.target.id === "guideModal") e.target.classList.add("hidden"); };
+  $("#lbClose").onclick = closeLightbox;
+  $("#lbPrev").onclick = () => stepLb(-1);
+  $("#lbNext").onclick = () => stepLb(1);
+  $("#lightbox").onclick = (e) => { if (e.target.id === "lightbox") closeLightbox(); };
+  document.addEventListener("keydown", (e) => {
+    if ($("#lightbox").classList.contains("hidden")) return;
+    if (e.key === "Escape") closeLightbox();
+    if (e.key === "ArrowRight") stepLb(1);
+    if (e.key === "ArrowLeft") stepLb(-1);
+  });
+  console.log(TAG, "Global events bound");
+}
+
+// Store shuru karta hai
+async function init() {
+  console.log(TAG, "Init");
+  bindGlobal();
+  view.innerHTML = '<div class="loader"></div>';
+  await Promise.all([loadApps(), loadStats()]);
+  router();
+  window.addEventListener("hashchange", router);
+}
+
+init();
+</script>
+</body>
+</html>
